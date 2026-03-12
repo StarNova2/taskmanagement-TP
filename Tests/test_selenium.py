@@ -27,14 +27,12 @@ def driver():
 
 
 def logout(driver):
-    """Helper: clear all auth state (localStorage + cookies)."""
     driver.get(BASE_URL)
     driver.execute_script("window.localStorage.clear();")
     driver.delete_all_cookies()
 
 
 def login(driver):
-    """Helper: ensure the driver is logged in as admin."""
     # Clear any existing session first
     logout(driver)
     driver.get(f"{BASE_URL}/login")
@@ -48,12 +46,7 @@ def login(driver):
     ))
 
 
-# ---------------------------------------------------------------------------
-# Authentication pages (frontend only, backend not required)
-# ---------------------------------------------------------------------------
-
 class TestAuthPages:
-    """Vérifie que les pages login et register chargent correctement."""
 
     def test_login_form_elements(self, driver):
         driver.get(f"{BASE_URL}/login")
