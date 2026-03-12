@@ -14,7 +14,7 @@ app.use(cors());
 app.use(express.json());
 
 // Base de données en mémoire (pour simplifier)
-let users = [
+const users = [
   {
     id: '1',
     email: 'admin@test.com',
@@ -23,7 +23,7 @@ let users = [
   }
 ];
 
-let tasks = [
+const tasks = [
   {
     id: '1',
     title: 'Tâche exemple',
