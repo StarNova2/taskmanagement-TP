@@ -1,0 +1,95 @@
+name: Advanced CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+    tags:
+      - "v*"
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        browser: [chrome, firefox]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install browsers
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable firefox
+
+      - name: Install dependencies
+        run: |
+          cd tests
+          pip install -r requirements.txt
+
+      - name: Run Selenium Tests (Multi Browser)
+        env:
+          CI: true
+          BROWSER: ${{ matrix.browser }}
+        run: |
+          cd tests
+          pytest -v --html=../report-${{ matrix.browser }}.html --self-contained-html
+
+      - name: Upload Test Reports
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: reports-${{ matrix.browser }}
+          path: report-${{ matrix.browser }}.html
+
+
+  notify:
+    needs: test
+    runs-on: ubuntu-latest
+    if: failure()
+
+    steps:
+      - name: Send Slack Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          fields: repo,message,commit,author
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      # Option Email (alternative simple)
+      - name: Send Email Notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "❌ Tests Failed - CI/CD Pipeline"
+          body: "Les tests Selenium ont échoué. Vérifiez GitHub Actions."
+          to: your-email@gmail.com
+          from: GitHub CI
+
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./src
