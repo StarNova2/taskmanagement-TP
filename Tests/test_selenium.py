@@ -155,6 +155,5 @@ class TestTaskForm:
         )
         assert len(driver.find_elements(By.CSS_SELECTOR, ".modal")) == 0
 
-
 if __name__ == "__main__":
     pytest.main(["-v", "--html=report.html", "--self-contained-html"])
