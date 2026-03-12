@@ -1,6 +1,6 @@
 # taskmanagement
 
-Application de gestion de tÃ¢ches
+Application de gestion de tâches
 
 Added main branch security
 
@@ -8,5 +8,6 @@ Tried to add eslint testing for right code writing
 
 Added selenium automated testing
 
-![alt text](tests/tests_success.png)
-![alt text](tests/test_warning.png)
+![alt text](Screenshots/tests_success.png)
+
+![alt text](Screenshots/test_warning.png)
